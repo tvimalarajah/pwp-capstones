@@ -21,12 +21,16 @@ class User(object):
         self.books[book] = rating
     
     def get_average_rating(self):
-        if len(self.books) > 0:
-            _sum = 0
-            for rating in self.books.values():
-                if rating is not None:
-                    _sum += rating
-            return _sum/len(self.books)
+        try:
+            if len(self.books) > 0:
+                _sum = 0
+                for rating in self.books.values():
+                    if rating is not None:
+                        _sum += rating
+                return _sum/len(self.books)
+        except Exception as e:
+            print(e)
+
 
 class Book(object):
     def __init__(self, title, isbn):
@@ -45,23 +49,28 @@ class Book(object):
         print("The ISBN for the book with title: {0} has been updated.".format(self.title))
 
     def add_rating(self, rating):
-        if rating is not None:
-            if 0 <= rating <= 4 :
-                self.ratings.append(rating)
-            else:
-                print("Invalid Rating")
-        else:
-            print("Invalid Rating")
+        try:
+            if rating is not None:
+                if 0 <= rating <= 4 :
+                    self.ratings.append(rating)
+                else:
+                    print("Invalid Rating")
+        except Exception as e: 
+            print(e)
 
     def __eq__(self, other_book):
         return self.title == other_book.title & self.isbn == other_book.isbn
 
     def get_average_rating(self):
-        if len(self.ratings) > 0:
-            _sum = 0
-            for x in self.ratings:
-                _sum += x
-            return _sum/len(self.ratings)
+        try:
+            if len(self.ratings) > 0:
+                _sum = 0
+                for x in self.ratings:
+                    _sum += x
+                return _sum/len(self.ratings)
+        except Exception as e: 
+            print(e)
+            return 0
     
     def __hash__(self):
         return hash((self.title, self.isbn))
@@ -111,11 +120,15 @@ class TomeRater(object):
             return None
 
     def Is_Unique_ISBN(self, isbn):
-        if len(self.added_books) > 0:
-            for book in self.added_books:
-                if book.isbn == isbn:
-                    return False
-        return True
+        try:
+            if len(self.added_books) > 0:
+                for book in self.added_books:
+                    if book.isbn == isbn:
+                        return False
+            return True
+        except Exception as e: 
+            print(e)
+            return False
 
     def create_novel(self, title, author, isbn):
         if self.Is_Unique_ISBN(isbn) is True:
@@ -136,39 +149,49 @@ class TomeRater(object):
             return None
 
     def add_user(self, name, email, user_books = None):
-        if email in self.users:
-            print("{0} already exists".format(email))
-        else:
-            if self.Is_Valid_Email(email) is True:
-                user = User(name, email)
-                self.users[email] = user
-                if user_books is not None:
-                    for book in user_books:
-                        if book is not None:
-                            self.add_book_to_user(book, email)
+        try:
+            if email in self.users:
+                print("{0} already exists".format(email))
+            else:
+                if self.Is_Valid_Email(email) is True:
+                    user = User(name, email)
+                    self.users[email] = user
+                    if user_books is not None:
+                        for book in user_books:
+                            if book is not None:
+                                self.add_book_to_user(book, email)
+        except Exception as e: 
+            print(e)
 
     def Is_Valid_Email(self, email):
-        if email.count('@') == 1:
-            domains = ['.com', '.edu', '.org']
-            for domain in domains:
-                if domain in email and email[-4:] == domain:
-                    return True
-        print("{0} is invalid".format(email))
-        return False
+        try:
+            if email.count('@') == 1:
+                domains = ['.com', '.edu', '.org']
+                for domain in domains:
+                    if domain in email and email[-4:] == domain:
+                        return True
+            print("{0} is invalid".format(email))
+            return False
+        except Exception as e: 
+            print(e)
+            return False
 
     def add_book_to_user(self, book, email, rating = None):
-        if self.Is_Valid_Email(email) is True:
-            user = self.users[email]
-            if email in self.users:
-                if book is not None:
-                    user.read_book(book, rating)
-                    book.add_rating(rating)
-                    if book in self.books:
-                        self.books[book] +=1
-                    else:
-                        self.books[book] = 1
-            else:
-                print("No user with email {0}!".format(email))
+        try:
+            if self.Is_Valid_Email(email) is True:
+                user = self.users[email]
+                if email in self.users:
+                    if book is not None:
+                        user.read_book(book, rating)
+                        book.add_rating(rating)
+                        if book in self.books:
+                            self.books[book] +=1
+                        else:
+                            self.books[book] = 1
+                else:
+                    print("No user with email {0}!".format(email))
+        except Exception as e: 
+            print(e)
 
     def print_catalog(self):
         for book in self.books.keys():
@@ -179,33 +202,45 @@ class TomeRater(object):
             print(user)
 
     def most_positive_user(self):
-        _highest_avg_rating = 0
-        _user = None
-        for user in self.users.values():
-            _avg_rating = user.get_average_rating()
-            if _avg_rating is not None:
-                if _avg_rating > _highest_avg_rating:
-                    _highest_avg_rating = _avg_rating
-                    _user = user
-        return _user
+        try:
+            _highest_avg_rating = 0
+            _user = None
+            for user in self.users.values():
+                _avg_rating = user.get_average_rating()
+                if _avg_rating is not None:
+                    if _avg_rating > _highest_avg_rating:
+                        _highest_avg_rating = _avg_rating
+                        _user = user
+            return _user
+        except Exception as e: 
+            print(e)
+            return None
 
     def highest_rated_book(self):
-        _highest_avg_rating = 0
-        _book = None
-        for book in self.books.keys():
-            _avg_rating = book.get_average_rating()
-            if _avg_rating is not None:
-                if _avg_rating > _highest_avg_rating:
-                    _highest_avg_rating = _avg_rating
-                    _book = book
-        return _book
+        try:
+            _highest_avg_rating = 0
+            _book = None
+            for book in self.books.keys():
+                _avg_rating = book.get_average_rating()
+                if _avg_rating is not None:
+                    if _avg_rating > _highest_avg_rating:
+                        _highest_avg_rating = _avg_rating
+                        _book = book
+            return _book
+        except Exception as e: 
+            print(e)
+            return None           
 
     def get_most_read_book(self):
-        _highest_read = 0
-        _book = None
-        for book, rating in self.books.items():
-            if rating > _highest_read:
-                _highest_read = rating
-                _book = book
-        return _book
+        try:
+            _highest_read = 0
+            _book = None
+            for book, rating in self.books.items():
+                if rating > _highest_read:
+                    _highest_read = rating
+                    _book = book
+            return _book
+        except Exception as e: 
+            print(e)
+            return None
 
